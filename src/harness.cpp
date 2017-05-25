@@ -2,21 +2,40 @@
  * Everything in here is dangerous.
  */
 #include "harness.h"
+#include <math.h>
 
 #define _BV(PIN) (1 << PIN)
 
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include "macros.h"
 #include "enum.h"
 #include "MarlinConfig.h"
 #include "Conditionals_post.h"
 
-#include "planner.h"
-
 
 // Define prototypes and constants needed
 #define MMM_TO_MMS(MM_M) ((MM_M)/60.0)
 #define MMS_SCALED(MM_S) ((MM_S)*feedrate_percentage*0.01)
+#define sq(a) (a * a)
+
+#if PLANNER_LEVELING
+    #define ARG_X float lx
+    #define ARG_Y float ly
+    #define ARG_Z float lz
+    /**
+     * Apply leveling to transform a cartesian position
+     * as it will be given to the planner and steppers.
+     */
+    static void apply_leveling(float &lx, float &ly, float &lz);
+    static void apply_leveling(float logical[XYZ]) { apply_leveling(logical[X_AXIS], logical[Y_AXIS], logical[Z_AXIS]); }
+    static void unapply_leveling(float logical[XYZ]);
+#else
+    #define ARG_X const float &lx
+    #define ARG_Y const float &ly
+    #define ARG_Z const float &lz
+#endif
 
 static float feedrate_mm_s = MMM_TO_MMS(1500.0);
 int feedrate_percentage = 100, saved_feedrate_percentage,
@@ -32,14 +51,50 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]);
 bool prepare_move_to_destination_dualx();
 bool prepare_move_to_cartesian();
 
+float abs(float f) { return fabs(f); }
 
+// BUFFER LINE FUNCTIONS
+static void _buffer_line(const float &a, const float &b, const float &c, const float &e, float fr_mm_s, const uint8_t extruder);
+
+static FORCE_INLINE void buffer_line(ARG_X, ARG_Y, ARG_Z, const float &e, const float &fr_mm_s, const uint8_t extruder) {
+  #if PLANNER_LEVELING && IS_CARTESIAN
+    apply_leveling(lx, ly, lz);
+  #endif
+  _buffer_line(lx, ly, lz, e, fr_mm_s, extruder);
+}
+
+static FORCE_INLINE void buffer_line_kinematic(const float ltarget[XYZE], const float &fr_mm_s, const uint8_t extruder) {
+  #if PLANNER_LEVELING
+    float lpos[XYZ] = { ltarget[X_AXIS], ltarget[Y_AXIS], ltarget[Z_AXIS] };
+    apply_leveling(lpos);
+  #else
+    const float * const lpos = ltarget;
+  #endif
+  #if IS_KINEMATIC
+    inverse_kinematics(lpos);
+    _buffer_line(delta[A_AXIS], delta[B_AXIS], delta[C_AXIS], ltarget[E_AXIS], fr_mm_s, extruder);
+  #else
+    _buffer_line(lpos[X_AXIS], lpos[Y_AXIS], lpos[Z_AXIS], ltarget[E_AXIS], fr_mm_s, extruder);
+  #endif
+}
+
+// planner._buffer_line
+void _buffer_line(const float &a, const float &b, const float &c, const float &e, float fr_mm_s, const uint8_t extruder) {
+    printf("_buf_ln(%f, %f, %f, %f, %f, %d)\n", a, b, c, e, fr_mm_s, extruder);
+}
+
+  // The target position of the tool in absolute steps
+
+// LINE TO DESTINATION
 inline void line_to_destination(float fr_mm_s) {
-    planner.buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], fr_mm_s, active_extruder);
+    // planner.buffer_line
+    buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], fr_mm_s, active_extruder);
 }
 
 inline void line_to_destination() { line_to_destination(feedrate_mm_s); }
 
-/*
+
+// PREPARE MOVE TO FUNCTIONS
 bool prepare_kinematic_move_to(float ltarget[XYZE]) {
 
     // Get the top feedrate of the move in the XY plane
@@ -47,7 +102,8 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]) {
 
     // If the move is only in Z/E don't split up the move
     if (ltarget[X_AXIS] == current_position[X_AXIS] && ltarget[Y_AXIS] == current_position[Y_AXIS]) {
-      planner.buffer_line_kinematic(ltarget, _feedrate_mm_s, active_extruder);
+      // planner.buffer_line
+      buffer_line_kinematic(ltarget, _feedrate_mm_s, active_extruder);
       return false;
     }
 
@@ -124,11 +180,13 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]) {
         // Use ratio between the length of the move and the larger angle change
         const float adiff = abs(delta[A_AXIS] - oldA),
                     bdiff = abs(delta[B_AXIS] - oldB);
-        planner.buffer_line(delta[A_AXIS], delta[B_AXIS], delta[C_AXIS], logical[E_AXIS], max(adiff, bdiff) * feed_factor, active_extruder);
+        // planner.buffer_line
+        buffer_line(delta[A_AXIS], delta[B_AXIS], delta[C_AXIS], logical[E_AXIS], max(adiff, bdiff) * feed_factor, active_extruder);
         oldA = delta[A_AXIS];
         oldB = delta[B_AXIS];
       #else
-        planner.buffer_line(delta[A_AXIS], delta[B_AXIS], delta[C_AXIS], logical[E_AXIS], _feedrate_mm_s, active_extruder);
+        // planner.buffer_line
+        buffer_line(delta[A_AXIS], delta[B_AXIS], delta[C_AXIS], logical[E_AXIS], _feedrate_mm_s, active_extruder);
       #endif
     }
 
@@ -142,14 +200,15 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]) {
       ADJUST_DELTA(logical);
       const float adiff = abs(delta[A_AXIS] - oldA),
                   bdiff = abs(delta[B_AXIS] - oldB);
-      planner.buffer_line(delta[A_AXIS], delta[B_AXIS], delta[C_AXIS], logical[E_AXIS], max(adiff, bdiff) * feed_factor, active_extruder);
+      // planner.buffer_line
+      buffer_line(delta[A_AXIS], delta[B_AXIS], delta[C_AXIS], logical[E_AXIS], max(adiff, bdiff) * feed_factor, active_extruder);
     #else
-      planner.buffer_line_kinematic(ltarget, _feedrate_mm_s, active_extruder);
+      // planner.buffer_line
+      buffer_line_kinematic(ltarget, _feedrate_mm_s, active_extruder);
     #endif
 
     return false;
   }
-*/
 
 bool prepare_move_to_destination_cartesian() {
     // Do not use feedrate_percentage for E or Z only moves
@@ -170,6 +229,7 @@ bool prepare_move_to_destination_cartesian() {
         }
         else
       #elif ENABLED(AUTO_BED_LEVELING_BILINEAR)
+        // planner.abl_enabled
         if (planner.abl_enabled) {
           bilinear_line_to_destination(MMS_SCALED(feedrate_mm_s));
           return true;
