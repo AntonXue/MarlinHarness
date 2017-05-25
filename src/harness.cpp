@@ -2,7 +2,9 @@
 
 #define _BV(PIN) (1 << PIN)
 
-#define XYZE 4
+#ifndef XYZE
+    #define XYZE 4
+#endif
 
 // #include "enum.h"
 // #include "macros.h"
