@@ -5,12 +5,13 @@
 
 #define _BV(PIN) (1 << PIN)
 
+#include <stdint.h>
 #include "macros.h"
 #include "enum.h"
 #include "MarlinConfig.h"
 #include "Conditionals_post.h"
 
-// #include "planner.h"
+#include "planner.h"
 
 
 // Define prototypes and constants needed
@@ -20,6 +21,7 @@
 static float feedrate_mm_s = MMM_TO_MMS(1500.0);
 int feedrate_percentage = 100, saved_feedrate_percentage,
     flow_percentage[EXTRUDERS] = ARRAY_BY_EXTRUDERS1(100);
+uint8_t active_extruder = 0;
 
 float current_position[XYZE] = { 0.0 };
 float destination[XYZE] = { 0.0 };
@@ -30,6 +32,12 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]);
 bool prepare_move_to_destination_dualx();
 bool prepare_move_to_cartesian();
 
+
+inline void line_to_destination(float fr_mm_s) {
+    planner.buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], fr_mm_s, active_extruder);
+}
+
+inline void line_to_destination() { line_to_destination(feedrate_mm_s); }
 
 /*
 bool prepare_kinematic_move_to(float ltarget[XYZE]) {
@@ -141,6 +149,7 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]) {
 
     return false;
   }
+*/
 
 bool prepare_move_to_destination_cartesian() {
     // Do not use feedrate_percentage for E or Z only moves
@@ -171,7 +180,6 @@ bool prepare_move_to_destination_cartesian() {
     }
     return false;
 }
-*/
 
 void calc_move(float cur[XYZE], float tgt[XYZE]) {
     #if IS_KINEMATIC
