@@ -10,7 +10,7 @@ OUTPUT    = harness
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 TGTS = $(subst $(SRC_DIR),$(BUILD_DIR),$(subst .cpp,.o,$(SRCS)))
 
-all: $(BUILD_DIR) $(TGTS)
+all: clean $(BUILD_DIR) $(TGTS)
 	$(CPP) $(FLAGS) $(TGTS) -o $(OUTPUT)
 
 $(BUILD_DIR):
