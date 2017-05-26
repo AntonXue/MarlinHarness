@@ -61,16 +61,16 @@ void parse_g0_g1_xyze(char* cmd, float cur[XYZE_DIM], float tgt[XYZE_DIM]) {
 
 
 int main(int argc, char* argv[]) {
-    printf("compiles and runs\n");
-    /*
-    char test[MAX_CMD_BUF_SIZE];
-    next_cmd(test, stdin, MAX_CMD_BUF_SIZE);
-    printf("test: %s\n", test);
+    // printf("compiles and runs\n");
+    // char test[MAX_CMD_BUF_SIZE];
+    // next_cmd(test, stdin, MAX_CMD_BUF_SIZE);
+    // printf("test: %s\n", test);
     
-    float current[] = {1, 2, 3, 4};
-    float target[XYZE_DIM];
+    float cur[] = {1, 2, 3, 4};
+    // float tgt[XYZE_DIM];
+    float tgt[] = {100, 200, 300, 400};
 
-    parse_g0_g1_xyze(test, current, target);
-    printf("%f, %f, %f, %f\n", target[0], target[1], target[2], target[3]);
-    */
+    // parse_g0_g1_xyze(test, cur, tgt);
+    // printf("%f, %f, %f, %f\n", tgt[0], tgt[1], tgt[2], tgt[3]);
+    calc_move(cur, tgt);
 }

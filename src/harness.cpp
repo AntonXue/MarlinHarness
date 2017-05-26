@@ -3,19 +3,52 @@
  */
 #include "harness.h"
 #include <math.h>
-
-#define _BV(PIN) (1 << PIN)
-
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+
+// Please don't break :(
+#define _BV(PIN) (1 << PIN)
+#define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+
+
+unsigned long millis() {
+    return (unsigned long) time(NULL) * 1000;  // Technically wrong.
+}
+
+#include "types.h"
 #include "macros.h"
 #include "enum.h"
 #include "MarlinConfig.h"
 #include "Conditionals_post.h"
-
+#include "Marlin.h"
 
 // Define prototypes and constants needed
+
+#if ENABLED(AUTO_BED_LEVELING_BILINEAR)
+  #if ENABLED(DELTA)
+    #define ADJUST_DELTA(V) \
+      if (planner.abl_enabled) { \
+        const float zadj = bilinear_z_offset(V); \
+        delta[A_AXIS] += zadj; \
+        delta[B_AXIS] += zadj; \
+        delta[C_AXIS] += zadj; \
+      }
+  #else
+    #define ADJUST_DELTA(V) if (planner.abl_enabled) { delta[Z_AXIS] += bilinear_z_offset(V); }
+  #endif
+#else
+  #if IS_KINEMATIC
+    #define ADJUST_DELTA(V) NOOP
+  #else
+    #define ADJUST_DELTA(V) NOOP // Hack I, Anton, added
+  #endif
+#endif
+
 #define MMM_TO_MMS(MM_M) ((MM_M)/60.0)
 #define MMS_SCALED(MM_S) ((MM_S)*feedrate_percentage*0.01)
 #define sq(a) (a * a)
@@ -45,6 +78,22 @@ uint8_t active_extruder = 0;
 float current_position[XYZE] = { 0.0 };
 float destination[XYZE] = { 0.0 };
 
+float delta[ABC],
+      endstop_adj[ABC] = { 0 };
+
+// These values are loaded or reset at boot time when setup() calls
+// settings.load(), which calls recalc_delta_settings().
+float delta_radius,
+      delta_tower_angle_trim[2],
+      delta_tower[ABC][2],
+      delta_diagonal_rod,
+      delta_calibration_radius,
+      delta_diagonal_rod_2_tower[ABC],
+      delta_segments_per_second,
+      delta_clip_start_height = Z_MAX_POS;
+float delta_safe_distance_from_top();
+
+
 void line_to_destination();
 void line_to_destination(float);
 bool prepare_kinematic_move_to(float ltarget[XYZE]);
@@ -52,6 +101,59 @@ bool prepare_move_to_destination_dualx();
 bool prepare_move_to_cartesian();
 
 float abs(float f) { return fabs(f); }
+
+
+#if ENABLED(DELTA)
+
+#else
+  #if ENABLED(MORGAN_SCARA)
+    void inverse_kinematics(const float logical[XYZ]) {
+
+      static float C2, S2, SK1, SK2, THETA, PSI;
+
+      float sx = RAW_X_POSITION(logical[X_AXIS]) - SCARA_OFFSET_X,  // Translate SCARA to standard X Y
+            sy = RAW_Y_POSITION(logical[Y_AXIS]) - SCARA_OFFSET_Y;  // With scaling factor.
+
+      if (L1 == L2)
+        C2 = HYPOT2(sx, sy) / L1_2_2 - 1;
+      else
+        C2 = (HYPOT2(sx, sy) - (L1_2 + L2_2)) / (2.0 * L1 * L2);
+
+      S2 = sqrt(sq(C2) - 1);
+
+      // Unrotated Arm1 plus rotated Arm2 gives the distance from Center to End
+      SK1 = L1 + L2 * C2;
+
+      // Rotated Arm2 gives the distance from Arm1 to Arm2
+      SK2 = L2 * S2;
+
+      // Angle of Arm1 is the difference between Center-to-End angle and the Center-to-Elbow
+      THETA = atan2(SK1, SK2) - atan2(sx, sy);
+
+      // Angle of Arm2
+      PSI = atan2(S2, C2);
+
+      delta[A_AXIS] = DEGREES(THETA);        // theta is support arm angle
+      delta[B_AXIS] = DEGREES(THETA + PSI);  // equal to sub arm angle (inverted motor)
+      delta[C_AXIS] = logical[Z_AXIS];
+
+      /*
+        DEBUG_POS("SCARA IK", logical);
+        DEBUG_POS("SCARA IK", delta);
+        SERIAL_ECHOPAIR("  SCARA (x,y) ", sx);
+        SERIAL_ECHOPAIR(",", sy);
+        SERIAL_ECHOPAIR(" C2=", C2);
+        SERIAL_ECHOPAIR(" S2=", S2);
+        SERIAL_ECHOPAIR(" Theta=", THETA);
+        SERIAL_ECHOLNPAIR(" Phi=", PHI);
+      //*/
+    }
+  #else
+    void inverse_kinematics(const float logical[XYZ]) {
+      printf("inverse_kinematics called when it should not have been\n");
+    }
+  #endif
+#endif
 
 // BUFFER LINE FUNCTIONS
 static void _buffer_line(const float &a, const float &b, const float &c, const float &e, float fr_mm_s, const uint8_t extruder);
@@ -242,13 +344,18 @@ bool prepare_move_to_destination_cartesian() {
 }
 
 void calc_move(float cur[XYZE], float tgt[XYZE]) {
+    for (int i = 0; i < XYZE; i++) {
+        current_position[i] = cur[i];
+        destination[i] = tgt[i];
+    }
+
     #if IS_KINEMATIC
-        // prepare_kinematic_move_to(tgt);
+        prepare_kinematic_move_to(tgt);
     #else
         #if DUAL_X_CARRIAGE // Most likely need to do the ENABLED thing.
-            // prepare_move_to_destination_dualx()
+            prepare_move_to_destination_dualx()
         #else
-            // prepare_move_to_cartesian();
+            prepare_move_to_destination_cartesian();
         #endif
     #endif
 }
