@@ -215,7 +215,8 @@ const float L1 = SCARA_LINKAGE_1, L2 = SCARA_LINKAGE_2,
       else
         C2 = (HYPOT2(sx, sy) - (L1_2 + L2_2)) / (2.0 * L1 * L2);
 
-      S2 = sqrt(sq(C2) - 1);
+      // S2 = sqrt(sq(C2) - 1);
+      S2 = sqrt(1 - sq(C2));  // Anton: beekm's fix
 
       // Unrotated Arm1 plus rotated Arm2 gives the distance from Center to End
       SK1 = L1 + L2 * C2;
