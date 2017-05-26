@@ -33,6 +33,13 @@ unsigned long millis() {
 #include "Marlin.h"
 
 // Define prototypes and constants needed
+#ifndef SCARA_LINKAGE_1
+  #define SCARA_LINKAGE_1 0
+#endif
+#ifndef SCARA_LINKAGE_2
+  #define SCARA_LINKAGE_2 0
+#endif
+
 #if ENABLED(DISTINCT_E_FACTORS) && E_STEPPERS > 1
   #define XYZE_N (XYZ + E_STEPPERS)
   #define E_AXIS_N (E_AXIS + extruder)
@@ -135,6 +142,29 @@ const float L1 = SCARA_LINKAGE_1, L2 = SCARA_LINKAGE_2,
             L1_2 = sq(float(L1)), L1_2_2 = 2.0 * L1_2,
             L2_2 = sq(float(L2));
 
+#if ENABLED(DELTA_FAST_SQRT)
+  /**
+   * Fast inverse sqrt from Quake III Arena
+   * See: https://en.wikipedia.org/wiki/Fast_inverse_square_root
+   */
+  float Q_rsqrt(float number) {
+    long i;
+    float x2, y;
+    const float threehalfs = 1.5f;
+    x2 = number * 0.5f;
+    y  = number;
+    i  = * ( long * ) &y;     // evil floating point bit level hacking
+    i  = 0x5F3759DF - ( i >> 1 );   // what the f***?
+    y  = * ( float * ) &i;
+    y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+    // y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+    return y;
+  }
+  #define _SQRT(n) (1.0f / Q_rsqrt(n))
+#else
+  #define _SQRT(n) sqrt(n)
+#endif
+
 #if ENABLED(DELTA)
   #define DELTA_Z(T) raw[Z_AXIS] + _SQRT(     \
     delta_diagonal_rod_2_tower[T] - HYPOT2(   \
@@ -203,7 +233,6 @@ const float L1 = SCARA_LINKAGE_1, L2 = SCARA_LINKAGE_2,
       delta[B_AXIS] = DEGREES(THETA + PSI);  // equal to sub arm angle (inverted motor)
       delta[C_AXIS] = logical[Z_AXIS];
 
-      printf("------------------------------------------------------\n");
       printf("SCARA_OFF_X: %d, SCARA_OFF_Y: %d\n",
              SCARA_OFFSET_X, SCARA_OFFSET_Y);
       printf("logical[XYZ] = [%f, %f, %f]\n",
@@ -305,6 +334,7 @@ void _buffer_line(const float &a, const float &b, const float &c, const float &e
       p = (char*)"Regular";
     #endif
     printf("[%s] bufln(%f, %f, %f, %f, %f, %d)\n", p,a,b,c,e,fr_mm_s,extruder);
+    printf("------------------------------------------------------\n");
 }
 
   // The target position of the tool in absolute steps

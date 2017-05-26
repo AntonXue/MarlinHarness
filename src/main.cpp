@@ -72,5 +72,8 @@ int main(int argc, char* argv[]) {
 
     // parse_g0_g1_xyze(test, cur, tgt);
     // printf("%f, %f, %f, %f\n", tgt[0], tgt[1], tgt[2], tgt[3]);
+
+    printf("cur: [%f, %f, %f, %f]\n", cur[0], cur[1], cur[2], cur[3]);
+    printf("tgt: [%f, %f, %f, %f]\n", tgt[0], tgt[1], tgt[2], tgt[3]);
     calc_move(cur, tgt);
 }
