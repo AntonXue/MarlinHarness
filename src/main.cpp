@@ -66,9 +66,9 @@ int main(int argc, char* argv[]) {
     // next_cmd(test, stdin, MAX_CMD_BUF_SIZE);
     // printf("test: %s\n", test);
     
-    float cur[] = {1, 2, 3, 4};
+    float cur[] = {150, 51, 52, 53};
     // float tgt[XYZE_DIM];
-    float tgt[] = {10, 20, 30, 40};
+    float tgt[] = {155, 56, 57, 58};
 
     // parse_g0_g1_xyze(test, cur, tgt);
     // printf("%f, %f, %f, %f\n", tgt[0], tgt[1], tgt[2], tgt[3]);

@@ -203,6 +203,16 @@ const float L1 = SCARA_LINKAGE_1, L2 = SCARA_LINKAGE_2,
       delta[B_AXIS] = DEGREES(THETA + PSI);  // equal to sub arm angle (inverted motor)
       delta[C_AXIS] = logical[Z_AXIS];
 
+      printf("------------------------------------------------------\n");
+      printf("SCARA_OFF_X: %d, SCARA_OFF_Y: %d\n",
+             SCARA_OFFSET_X, SCARA_OFFSET_Y);
+      printf("logical[XYZ] = [%f, %f, %f]\n",
+             logical[X_AXIS], logical[Y_AXIS], logical[Z_AXIS]);
+      printf("C2: %f, S2: %f, SK1: %f, SK2: %f, THETA: %f, PSI: %f, sx: %f, sy: %f\n",
+              C2, S2, SK1, SK2, THETA, PSI, sx, sy);
+      printf("L1: %f, L1_2: %f, L1_2_2: %f, L2: %f, L2_2: %f\n",
+             L1, L1_2, L1_2_2, L2, L2_2);
+              
       /*
         DEBUG_POS("SCARA IK", logical);
         DEBUG_POS("SCARA IK", delta);
@@ -283,19 +293,18 @@ static FORCE_INLINE void buffer_line_kinematic(const float ltarget[XYZE], const 
 
 // planner._buffer_line
 void _buffer_line(const float &a, const float &b, const float &c, const float &e, float fr_mm_s, const uint8_t extruder) {
+    char* p;
     #if IS_KINEMATIC
-      printf("KINEMATIC\n");
+      #if ENABLED(DELTA)
+        p = (char*)"DELTA";
+      #endif
+      #if IS_SCARA
+        p = (char*)"SCARA";
+      #endif
+    #else
+      p = (char*)"Regular";
     #endif
-
-    #if ENABLED(DELTA)
-      printf("We are in a DELTA configuration\n");
-    #endif
-
-    #if IS_SCARA
-      printf("We are in a SCARA configuration\n");
-    #endif
-
-    printf("_buf_ln(%f, %f, %f, %f, %f, %d)\n", a, b, c, e, fr_mm_s, extruder);
+    printf("[%s] bufln(%f, %f, %f, %f, %f, %d)\n", p,a,b,c,e,fr_mm_s,extruder);
 }
 
   // The target position of the tool in absolute steps
@@ -311,13 +320,13 @@ inline void line_to_destination() { line_to_destination(feedrate_mm_s); }
 
 // PREPARE MOVE TO FUNCTIONS
 bool prepare_kinematic_move_to(float ltarget[XYZE]) {
-
     // Get the top feedrate of the move in the XY plane
     float _feedrate_mm_s = MMS_SCALED(feedrate_mm_s);
 
     // If the move is only in Z/E don't split up the move
     if (ltarget[X_AXIS] == current_position[X_AXIS] && ltarget[Y_AXIS] == current_position[Y_AXIS]) {
       // planner.buffer_line
+      printf("BUFFERING HERE FOR SOME REASON\n");
       buffer_line_kinematic(ltarget, _feedrate_mm_s, active_extruder);
       return false;
     }
@@ -337,10 +346,12 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]) {
 
     // Minimum number of seconds to move the given distance
     float seconds = cartesian_mm / _feedrate_mm_s;
+    printf("Seconds: %f\n", seconds);
 
     // The number of segments-per-second times the duration
     // gives the number of segments
     uint16_t segments = delta_segments_per_second * seconds;
+    printf("Segments: %d\n", segments);
 
     // For SCARA minimum segment size is 0.25mm
     #if IS_SCARA
@@ -389,6 +400,8 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]) {
       #endif
 
       ADJUST_DELTA(logical); // Adjust Z if bed leveling is enabled
+
+      // printf("D: [%f, %f, %f]\n", delta[A_AXIS],delta[B_AXIS],delta[C_AXIS]);
 
       #if IS_SCARA
         // For SCARA scale the feed rate from mm/s to degrees/s
