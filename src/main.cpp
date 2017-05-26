@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
     
     float cur[] = {1, 2, 3, 4};
     // float tgt[XYZE_DIM];
-    float tgt[] = {100, 200, 300, 400};
+    float tgt[] = {10, 20, 30, 40};
 
     // parse_g0_g1_xyze(test, cur, tgt);
     // printf("%f, %f, %f, %f\n", tgt[0], tgt[1], tgt[2], tgt[3]);

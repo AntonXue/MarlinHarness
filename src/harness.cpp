@@ -14,6 +14,11 @@
    ({ __typeof__ (a) _a = (a); \
        __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
+#define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+
 
 
 unsigned long millis() {
@@ -28,6 +33,14 @@ unsigned long millis() {
 #include "Marlin.h"
 
 // Define prototypes and constants needed
+#if ENABLED(DISTINCT_E_FACTORS) && E_STEPPERS > 1
+  #define XYZE_N (XYZ + E_STEPPERS)
+  #define E_AXIS_N (E_AXIS + extruder)
+#else
+  #undef DISTINCT_E_FACTORS
+  #define XYZE_N XYZE
+  #define E_AXIS_N E_AXIS
+#endif
 
 #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
   #if ENABLED(DELTA)
@@ -70,6 +83,9 @@ unsigned long millis() {
     #define ARG_Z const float &lz
 #endif
 
+float workspace_offset[XYZ] = { 0 };
+volatile long count_position[NUM_AXIS] = { 0 };
+
 static float feedrate_mm_s = MMM_TO_MMS(1500.0);
 int feedrate_percentage = 100, saved_feedrate_percentage,
     flow_percentage[EXTRUDERS] = ARRAY_BY_EXTRUDERS1(100);
@@ -81,6 +97,9 @@ float destination[XYZE] = { 0.0 };
 float delta[ABC],
       endstop_adj[ABC] = { 0 };
 
+// planner.steps_to_mm
+float steps_to_mm[XYZE_N];
+
 // These values are loaded or reset at boot time when setup() calls
 // settings.load(), which calls recalc_delta_settings().
 float delta_radius,
@@ -89,10 +108,19 @@ float delta_radius,
       delta_diagonal_rod,
       delta_calibration_radius,
       delta_diagonal_rod_2_tower[ABC],
-      delta_segments_per_second,
+      // delta_segments_per_second,
       delta_clip_start_height = Z_MAX_POS;
 float delta_safe_distance_from_top();
 
+#if ENABLED(DELTA)
+    float delta_segments_per_second = Z_MAX_POS;
+#else
+  #if IS_SCARA
+    float delta_segments_per_second = SCARA_SEGMENTS_PER_SECOND;
+  #else
+    float delta_segments_per_second = 0;
+  #endif
+#endif
 
 void line_to_destination();
 void line_to_destination(float);
@@ -102,9 +130,47 @@ bool prepare_move_to_cartesian();
 
 float abs(float f) { return fabs(f); }
 
+// Float constants for SCARA calculations
+const float L1 = SCARA_LINKAGE_1, L2 = SCARA_LINKAGE_2,
+            L1_2 = sq(float(L1)), L1_2_2 = 2.0 * L1_2,
+            L2_2 = sq(float(L2));
 
 #if ENABLED(DELTA)
+  #define DELTA_Z(T) raw[Z_AXIS] + _SQRT(     \
+    delta_diagonal_rod_2_tower[T] - HYPOT2(   \
+        delta_tower[T][X_AXIS] - raw[X_AXIS], \
+        delta_tower[T][Y_AXIS] - raw[Y_AXIS]  \
+      )                                       \
+    )
 
+  #define DELTA_RAW_IK() do {        \
+    delta[A_AXIS] = DELTA_Z(A_AXIS); \
+    delta[B_AXIS] = DELTA_Z(B_AXIS); \
+    delta[C_AXIS] = DELTA_Z(C_AXIS); \
+  } while(0)
+
+  #define DELTA_LOGICAL_IK() do {      \
+    const float raw[XYZ] = {           \
+      RAW_X_POSITION(logical[X_AXIS]), \
+      RAW_Y_POSITION(logical[Y_AXIS]), \
+      RAW_Z_POSITION(logical[Z_AXIS])  \
+    };                                 \
+    DELTA_RAW_IK();                    \
+  } while(0)
+
+  #define DELTA_DEBUG() do { \
+      SERIAL_ECHOPAIR("cartesian X:", raw[X_AXIS]); \
+      SERIAL_ECHOPAIR(" Y:", raw[Y_AXIS]);          \
+      SERIAL_ECHOLNPAIR(" Z:", raw[Z_AXIS]);        \
+      SERIAL_ECHOPAIR("delta A:", delta[A_AXIS]);   \
+      SERIAL_ECHOPAIR(" B:", delta[B_AXIS]);        \
+      SERIAL_ECHOLNPAIR(" C:", delta[C_AXIS]);      \
+    } while(0)
+
+  void inverse_kinematics(const float logical[XYZ]) {
+    DELTA_LOGICAL_IK();
+    // DELTA_DEBUG();
+  }
 #else
   #if ENABLED(MORGAN_SCARA)
     void inverse_kinematics(const float logical[XYZ]) {
@@ -155,6 +221,41 @@ float abs(float f) { return fabs(f); }
   #endif
 #endif
 
+// Axis position functions
+// stepper.position
+long position(AxisEnum axis) {
+  // CRITICAL_SECTION_START;
+  const long count_pos = count_position[axis];
+  // CRITICAL_SECTION_END;
+  return count_pos;
+}
+
+// stepper.get_axis_position_mm
+float get_axis_position_mm(AxisEnum axis) {
+  float axis_steps;
+  #if IS_CORE
+    // Requesting one of the "core" axes?
+    if (axis == CORE_AXIS_1 || axis == CORE_AXIS_2) {
+      CRITICAL_SECTION_START;
+      // ((a1+a2)+(a1-a2))/2 -> (a1+a2+a1-a2)/2 -> (a1+a1)/2 -> a1
+      // ((a1+a2)-(a1-a2))/2 -> (a1+a2-a1+a2)/2 -> (a2+a2)/2 -> a2
+      axis_steps = 0.5f * (
+        axis == CORE_AXIS_2 ? CORESIGN(count_position[CORE_AXIS_1] - count_position[CORE_AXIS_2])
+                            : count_position[CORE_AXIS_1] + count_position[CORE_AXIS_2]
+      );
+      CRITICAL_SECTION_END;
+    }
+    else
+      axis_steps = position(axis);
+  #else
+    axis_steps = position(axis);
+  #endif
+  return axis_steps * steps_to_mm[axis];
+}
+
+// stepper.get_axis_position_degrees
+float get_axis_position_degrees(AxisEnum axis) { return get_axis_position_mm(axis); }
+
 // BUFFER LINE FUNCTIONS
 static void _buffer_line(const float &a, const float &b, const float &c, const float &e, float fr_mm_s, const uint8_t extruder);
 
@@ -182,6 +283,18 @@ static FORCE_INLINE void buffer_line_kinematic(const float ltarget[XYZE], const 
 
 // planner._buffer_line
 void _buffer_line(const float &a, const float &b, const float &c, const float &e, float fr_mm_s, const uint8_t extruder) {
+    #if IS_KINEMATIC
+      printf("KINEMATIC\n");
+    #endif
+
+    #if ENABLED(DELTA)
+      printf("We are in a DELTA configuration\n");
+    #endif
+
+    #if IS_SCARA
+      printf("We are in a SCARA configuration\n");
+    #endif
+
     printf("_buf_ln(%f, %f, %f, %f, %f, %d)\n", a, b, c, e, fr_mm_s, extruder);
 }
 
@@ -254,8 +367,8 @@ bool prepare_kinematic_move_to(float ltarget[XYZE]) {
       // SCARA needs to scale the feed rate from mm/s to degrees/s
       const float inv_segment_length = min(10.0, float(segments) / cartesian_mm), // 1/mm/segs
                   feed_factor = inv_segment_length * _feedrate_mm_s;
-      float oldA = stepper.get_axis_position_degrees(A_AXIS),
-            oldB = stepper.get_axis_position_degrees(B_AXIS);
+      float oldA = get_axis_position_degrees(A_AXIS);
+      float oldB = get_axis_position_degrees(B_AXIS);
     #endif
 
     // Get the logical current position as starting point
