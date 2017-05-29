@@ -869,8 +869,12 @@ void _buffer_line(const float &a, const float &b, const float &c, const float &e
     delta_mm[X_AXIS] = da * steps_to_mm[X_AXIS];
     delta_mm[Y_AXIS] = db * steps_to_mm[Y_AXIS];
     delta_mm[Z_AXIS] = dc * steps_to_mm[Z_AXIS];
+
   #endif
   delta_mm[E_AXIS] = esteps_float * steps_to_mm[E_AXIS_N];
+  // printf("[da, db, dc, de] = [%f, %f, %f, %f]\n", da, db, dc, esteps_float);
+  // printf("steps_to_mm[XYZE] = [%f, %f, %f, %f]\n",
+  //        steps_to_mm[X_AXIS], steps_to_mm[Y_AXIS], steps_to_mm[Z_AXIS], steps_to_mm[E_AXIS]);
 
   if (block->steps[X_AXIS] < MIN_STEPS_PER_SEGMENT && block->steps[Y_AXIS] < MIN_STEPS_PER_SEGMENT && block->steps[Z_AXIS] < MIN_STEPS_PER_SEGMENT) {
     block->millimeters = fabs(delta_mm[E_AXIS]);
@@ -960,6 +964,7 @@ void _buffer_line(const float &a, const float &b, const float &c, const float &e
   float current_speed[NUM_AXIS], speed_factor = 1.0; // factor <1 decreases speed
   LOOP_XYZE(i) {
     const float cs = fabs(current_speed[i] = delta_mm[i] * inverse_mm_s);
+    // printf("cs[%f], d_mm[%f], i_mms[%f]\n", current_speed[i], delta_mm[i], inverse_mm_s);
     #if ENABLED(DISTINCT_E_FACTORS)
       if (i == E_AXIS) i += extruder;
     #endif
@@ -1277,6 +1282,14 @@ void _buffer_line(const float &a, const float &b, const float &c, const float &e
   printf("steps[XYZE] = [%d, %d, %d, %d]\n",
          block->steps[X_AXIS], block->steps[Y_AXIS],
          block->steps[Z_AXIS], block->steps[E_AXIS]);
+  // printf("max_accel_steps_per_s2[XYZE] = [%d, %d, %d, %d]\n",
+  //        max_acceleration_steps_per_s2[X_AXIS],
+  //        max_acceleration_steps_per_s2[Y_AXIS],
+  //        max_acceleration_steps_per_s2[Z_AXIS],
+  //        max_acceleration_steps_per_s2[E_AXIS]);
+  printf("current_speed[XYZE]: [%f, %f, %f, %f]\n",
+          current_speed[X_AXIS], current_speed[Y_AXIS],
+          current_speed[Z_AXIS], current_speed[E_AXIS]);
   printf("------------------------------------------------------\n"); 
 } // end of _buffer_line()
 
@@ -1505,6 +1518,8 @@ void calc_move(float cur[XYZE], float tgt[XYZE]) {
         current_position[i] = cur[i];
         destination[i] = tgt[i];
     }
+
+    LOOP_XYZE_N(i) steps_to_mm[i] = 1.0 / axis_steps_per_mm[i];
 
     #if IS_KINEMATIC
         prepare_kinematic_move_to(tgt);
