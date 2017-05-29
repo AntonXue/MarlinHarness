@@ -23,6 +23,8 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#include <string.h>
+
 #define NUM_AXIS 4
 #define XYZE 4
 #define ABC  3
