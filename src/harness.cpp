@@ -8,6 +8,8 @@
 #include <string.h>
 #include <time.h>
 
+int acc_steps[4] = { 0 };
+
 // Please don't break :(
 #define _BV(PIN) (1 << PIN)
 #define min(a,b) \
@@ -1291,6 +1293,8 @@ void _buffer_line(const float &a, const float &b, const float &c, const float &e
           current_speed[X_AXIS], current_speed[Y_AXIS],
           current_speed[Z_AXIS], current_speed[E_AXIS]);
   printf("------------------------------------------------------\n"); 
+
+  for (int i = 0; i < XYZE; i++) { acc_steps[i] += block->steps[i]; }
 } // end of _buffer_line()
 
 /*
@@ -1529,5 +1533,18 @@ void calc_move(float cur[XYZE], float tgt[XYZE]) {
         #else
             prepare_move_to_destination_cartesian();
         #endif
+    #endif
+
+    printf("Total steps taken: [%d, %d, %d, %d]\n",
+            acc_steps[0], acc_steps[1], acc_steps[2], acc_steps[3]);
+
+    #if IS_KINEMATIC
+
+    #else
+        float x_mm = acc_steps[0] / axis_steps_per_mm[0];
+        float y_mm = acc_steps[1] / axis_steps_per_mm[1];
+        float z_mm = acc_steps[2] / axis_steps_per_mm[2];;
+        float e_mm = acc_steps[3] / axis_steps_per_mm[3];
+        printf("mm: [%f, %f, %f, %f]\n", x_mm, y_mm, z_mm, e_mm);
     #endif
 }
