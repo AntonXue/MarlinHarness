@@ -686,6 +686,7 @@ void _buffer_line(const float &a, const float &b, const float &c, const float &e
   #endif
 
   block->steps[E_AXIS] = esteps;
+
   block->step_event_count = MAX4(block->steps[X_AXIS], block->steps[Y_AXIS], block->steps[Z_AXIS], esteps);
 
   // Bail if this is a zero-length block
@@ -1271,6 +1272,7 @@ void _buffer_line(const float &a, const float &b, const float &c, const float &e
 
   // Update the position (only when a move was queued)
   COPY(pl_position, target);
+
   #if ENABLED(LIN_ADVANCE)
     position_float[X_AXIS] = a;
     position_float[Y_AXIS] = b;
@@ -1520,6 +1522,7 @@ void calculate_trapezoid_for_block(block_t* const block, const float &entry_fact
 void calc_move(float cur[XYZE], float tgt[XYZE]) {
     for (int i = 0; i < XYZE; i++) {
         current_position[i] = cur[i];
+        pl_position[i] = lround(axis_steps_per_mm[i] * cur[i]);
         destination[i] = tgt[i];
     }
 
@@ -1539,12 +1542,23 @@ void calc_move(float cur[XYZE], float tgt[XYZE]) {
             acc_steps[0], acc_steps[1], acc_steps[2], acc_steps[3]);
 
     #if IS_KINEMATIC
-
+      #if IS_SCARA
+          float a_deg = acc_steps[0] / axis_steps_per_mm[0];
+          float b_deg = acc_steps[1] / axis_steps_per_mm[1];
+          float z_mm  = acc_steps[2] / axis_steps_per_mm[2];
+          float e_mm  = acc_steps[3] / axis_steps_per_mm[3];
+          printf("[SCARA] acc: [%f, %f, %f, %f]\n", a_deg, b_deg, z_mm, e_mm);
+      #else
+          printf("[DELTA] acc: configuration goes here\n");
+      #endif
     #else
         float x_mm = acc_steps[0] / axis_steps_per_mm[0];
         float y_mm = acc_steps[1] / axis_steps_per_mm[1];
         float z_mm = acc_steps[2] / axis_steps_per_mm[2];;
         float e_mm = acc_steps[3] / axis_steps_per_mm[3];
-        printf("mm: [%f, %f, %f, %f]\n", x_mm, y_mm, z_mm, e_mm);
+        printf("axis per step: [%f, %f, %f, %f]\n",
+                axis_steps_per_mm[0], axis_steps_per_mm[1],
+                axis_steps_per_mm[2], axis_steps_per_mm[3]);
+        printf("[Regular] acc: [%f, %f, %f, %f]\n", x_mm, y_mm, z_mm, e_mm);
     #endif
 }
