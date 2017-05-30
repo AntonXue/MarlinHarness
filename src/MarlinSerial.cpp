@@ -631,6 +631,15 @@ uint8_t LOW = 0;
   void MarlinSerial::print(unsigned long l, int b) {}
   void MarlinSerial::print(double d, int b) {}
  
+  void MarlinSerial::println(const char[]) {}
+  void MarlinSerial::println(char c, int b) {}
+  void MarlinSerial::println(unsigned char c, int b) {}
+  void MarlinSerial::println(int i, int b) {}
+  void MarlinSerial::println(unsigned int i, int b) {}
+  void MarlinSerial::println(long l, int b) {}
+  void MarlinSerial::println(unsigned long l, int b) {}
+  void MarlinSerial::println(double d, int b) {}
+  void MarlinSerial::println(void) {}
 
 #endif
 
