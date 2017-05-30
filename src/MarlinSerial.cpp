@@ -52,6 +52,7 @@ uint8_t PINA6 = 0;
 
 uint8_t PINB = 0;
 uint8_t PINB4 = 0;
+uint8_t PINB6 = 0;
 
 uint8_t PINC = 0;
 uint8_t PINC1 = 0;
@@ -59,10 +60,12 @@ uint8_t PINC3 = 0;
 uint8_t PINC7 = 0;
 
 uint8_t PIND = 0;
+uint8_t PIND2 = 0;
 uint8_t PIND3 = 0;
 uint8_t PIND7 = 0;
 
 uint8_t PINE = 0;
+uint8_t PINE4 = 0;
 uint8_t PINE5 = 0;
 
 uint8_t PINF = 0;
@@ -77,6 +80,7 @@ uint8_t PINH5 = 0;
 uint8_t PINH6 = 0;
 
 uint8_t PINJ = 0;
+uint8_t PINJ0 = 0;
 uint8_t PINJ1 = 0;
 
 uint8_t PINK = 0;

@@ -62,6 +62,7 @@ extern uint8_t PINA6;
 
 extern uint8_t PINB;
 extern uint8_t PINB4;
+extern uint8_t PINB6;
 
 extern uint8_t PINC;
 extern uint8_t PINC1;
@@ -69,10 +70,12 @@ extern uint8_t PINC3;
 extern uint8_t PINC7;
 
 extern uint8_t PIND;
+extern uint8_t PIND2;
 extern uint8_t PIND3;
 extern uint8_t PIND7;
 
 extern uint8_t PINE;
+extern uint8_t PINE4;
 extern uint8_t PINE5;
 
 extern uint8_t PINF;
@@ -87,6 +90,7 @@ extern uint8_t PINH5;
 extern uint8_t PINH6;
 
 extern uint8_t PINJ;
+extern uint8_t PINJ0;
 extern uint8_t PINJ1;
 
 extern uint8_t PINK;
