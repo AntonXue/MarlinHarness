@@ -32,27 +32,58 @@
 #include "MarlinSerial.h"
 #include "Marlin.h"
 
+uint8_t DDRA = 0;
 uint8_t DDRB = 0;
+uint8_t DDRC = 0;
+uint8_t DDRD = 0;
+uint8_t DDRE = 0;
+uint8_t DDRF = 0;
+uint8_t DDRG = 0;
 uint8_t DDRH = 0;
+uint8_t DDRI = 0;
+uint8_t DDRJ = 0;
+uint8_t DDRK = 0;
+uint8_t DDRL = 0;
 
 uint8_t PINA = 0;
 uint8_t PINA2 = 0;
+uint8_t PINA6 = 0;
 
 uint8_t PINB = 0;
 uint8_t PINB4 = 0;
 
+uint8_t PINC = 0;
+uint8_t PINC1 = 0;
+uint8_t PINC3 = 0;
+uint8_t PINC7 = 0;
+
 uint8_t PIND = 0;
+uint8_t PIND3 = 0;
 uint8_t PIND7 = 0;
 
+uint8_t PINE = 0;
+uint8_t PINE5 = 0;
+
 uint8_t PINF = 0;
+uint8_t PINF0 = 0;
+uint8_t PINF1 = 0;
 uint8_t PINF2 = 0;
+uint8_t PINF6 = 0;
+uint8_t PINF7 = 0;
 
 uint8_t PINH = 0;
 uint8_t PINH5 = 0;
 uint8_t PINH6 = 0;
 
+uint8_t PINJ = 0;
+uint8_t PINJ1 = 0;
+
 uint8_t PINK = 0;
 uint8_t PINK0 = 0;
+
+uint8_t PINL = 0;
+uint8_t PINL1 = 0;
+uint8_t PINL3 = 0;
 
 uint8_t ADC = 0;  // Anton: or perhaps it should be 5???
 uint8_t ADCSRA = 0;
@@ -65,17 +96,34 @@ uint8_t ADMUX = 0;
 uint8_t DIDR0 = 0;
 uint8_t OCR0B = 0;
 uint8_t TIMSK0 = 0;
+uint8_t TIMSK1 = 0;
+
 uint8_t OCIE0B = 0;
+uint8_t OCIE1A = 0;
 
 uint8_t PORTA = 0;
 uint8_t PORTB = 0;
+uint8_t PORTC = 0;
 uint8_t PORTD = 0;
+uint8_t PORTE = 0;
 uint8_t PORTF = 0;
+uint8_t PORTG = 0;
 uint8_t PORTH = 0;
+uint8_t PORTI = 0;
+uint8_t PORTJ = 0;
 uint8_t PORTK = 0;
+uint8_t PORTL = 0;
 
 uint8_t REFS0 = 0;
 uint8_t OCR1A = 0;
+
+uint8_t TCNT1 = 0;
+uint8_t CS10 = 0;
+uint8_t COM1A0 = 0;
+uint8_t WGM10 = 0;
+uint8_t WGM12 = 0;
+uint8_t TCCR1A = 0;
+uint8_t TCCR1B = 0;
 
 uint8_t HIGH = 1;
 uint8_t LOW = 0;

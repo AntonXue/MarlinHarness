@@ -38,30 +38,63 @@
   #define SERIAL_PORT 0
 #endif
 
+typedef char byte;
 typedef unsigned char uint8_t;
 typedef short unsigned int uint16_t;
 
+extern uint8_t DDRA;
 extern uint8_t DDRB;
+extern uint8_t DDRC;
+extern uint8_t DDRD;
+extern uint8_t DDRE;
+extern uint8_t DDRF;
+extern uint8_t DDRG;
 extern uint8_t DDRH;
+extern uint8_t DDRI;
+extern uint8_t DDRJ;
+extern uint8_t DDRK;
+extern uint8_t DDRL;
 
 extern uint8_t PINA;
 extern uint8_t PINA2;
+extern uint8_t PINA4;
+extern uint8_t PINA6;
 
 extern uint8_t PINB;
 extern uint8_t PINB4;
 
+extern uint8_t PINC;
+extern uint8_t PINC1;
+extern uint8_t PINC3;
+extern uint8_t PINC7;
+
 extern uint8_t PIND;
+extern uint8_t PIND3;
 extern uint8_t PIND7;
 
+extern uint8_t PINE;
+extern uint8_t PINE5;
+
 extern uint8_t PINF;
+extern uint8_t PINF0;
+extern uint8_t PINF1;
 extern uint8_t PINF2;
+extern uint8_t PINF6;
+extern uint8_t PINF7;
 
 extern uint8_t PINH;
 extern uint8_t PINH5;
 extern uint8_t PINH6;
 
+extern uint8_t PINJ;
+extern uint8_t PINJ1;
+
 extern uint8_t PINK;
 extern uint8_t PINK0;
+
+extern uint8_t PINL;
+extern uint8_t PINL1;
+extern uint8_t PINL3;
 
 extern uint8_t ADC;
 extern uint8_t ADCSRA;
@@ -74,17 +107,34 @@ extern uint8_t ADMUX;
 extern uint8_t DIDR0;
 extern uint8_t OCR0B;
 extern uint8_t TIMSK0;
+extern uint8_t TIMSK1;
+
 extern uint8_t OCIE0B;
+extern uint8_t OCIE1A;
 
 extern uint8_t PORTA;
 extern uint8_t PORTB;
+extern uint8_t PORTC;
 extern uint8_t PORTD;
+extern uint8_t PORTE;
 extern uint8_t PORTF;
+extern uint8_t PORTG;
 extern uint8_t PORTH;
+extern uint8_t PORTI;
+extern uint8_t PORTJ;
 extern uint8_t PORTK;
+extern uint8_t PORTL;
 
 extern uint8_t REFS0;
 extern uint8_t OCR1A;
+
+extern uint8_t TCNT1;
+extern uint8_t CS10;
+extern uint8_t COM1A0;
+extern uint8_t WGM10;
+extern uint8_t WGM12;
+extern uint8_t TCCR1A;
+extern uint8_t TCCR1B;
 
 extern uint8_t HIGH;
 extern uint8_t LOW;
