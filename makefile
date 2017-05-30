@@ -1,7 +1,7 @@
 # C/C++ Compiler Information
 CPP   = g++
-FLAGS = -std=gnu++11 -Wall -fpack-struct -fshort-enums -ffunction-sections \
-        -flto -g
+FLAGS = -std=gnu++11 -fpack-struct -fshort-enums -ffunction-sections \
+        -flto -g -Wno-ununsed-variable
 
 # Build Information
 BUILD_DIR = build

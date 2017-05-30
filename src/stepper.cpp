@@ -202,6 +202,7 @@ volatile long Stepper::endstops_trigsteps[XYZ];
 // C1 B1 A1 is longIn1
 // D2 C2 B2 A2 is longIn2
 //
+/*
 #define MultiU24X32toH16(intRes, longIn1, longIn2) \
   asm volatile ( \
                  "clr r26 \n\t" \
@@ -247,6 +248,8 @@ volatile long Stepper::endstops_trigsteps[XYZ];
                  : \
                  "r26" , "r27" \
                )
+*/
+#define MultiU24X32toH16(intRes, longIn1, longIn2) 
 
 // Some useful constants
 

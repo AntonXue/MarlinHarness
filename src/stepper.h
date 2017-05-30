@@ -56,6 +56,7 @@ extern Stepper stepper;
 // uses:
 // r26 to store 0
 // r27 to store the byte 1 of the 24 bit result
+/*
 #define MultiU16X8toH16(intRes, charIn1, intIn2) \
   asm volatile ( \
                  "clr r26 \n\t" \
@@ -76,6 +77,8 @@ extern Stepper stepper;
                  : \
                  "r26" \
                )
+*/
+#define MultiU16X8toH16(intRes, charIn1, intIn2) 
 
 class Stepper {
 

@@ -47,6 +47,7 @@ uint8_t DDRL = 0;
 
 uint8_t PINA = 0;
 uint8_t PINA2 = 0;
+uint8_t PINA4 = 0;
 uint8_t PINA6 = 0;
 
 uint8_t PINB = 0;

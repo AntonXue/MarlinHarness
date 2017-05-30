@@ -10,3 +10,4 @@ volatile bool wait_for_heatup = false;
 void print_heaterstates() {}
 void kill(const char*) {}
 
+Stopwatch print_job_timer = Stopwatch();
