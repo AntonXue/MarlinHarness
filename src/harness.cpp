@@ -4,7 +4,11 @@
 #include "Marlin.h"
 #include "planner.h"
 
+char __bss_end = '\0';
+int* __brkval = NULL;
+
 // A bunch of stuff that were externed to Marlin_main.cpp
+/*
 bool Running = true;
 volatile bool wait_for_heatup = false;
 float current_position [XYZE] = { 0.0 };
@@ -47,3 +51,4 @@ bool code_seen(char code) {
     // return (seen_pointer != NULL); // Return TRUE if the code-letter was found
     return true;
 }
+*/

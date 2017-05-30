@@ -618,6 +618,15 @@ uint8_t LOW = 0;
 #else // !USBCON && (UBRRH || UBRR0H || UBRR1H || UBRR2H || UBRR3H)
 // Give some really stupid definitions.
   
+  void MarlinSerial::begin(const long) {}
+  void MarlinSerial::end() {}
+  int MarlinSerial::peek() { return 0; }
+  int MarlinSerial::read() { return 0; }
+  void MarlinSerial::flush() {}
+  uint8_t MarlinSerial::available() { return 0; }
+  void MarlinSerial::checkRx() {}
+
+
   void MarlinSerial::write(const uint8_t c) {}
   void MarlinSerial::write(const char* str) {}
   void MarlinSerial::write(const uint8_t* buffer, size_t size) {}

@@ -36,6 +36,8 @@
 #define __AVR_ATmega2560__
 
 #define delay(n) do{ printf("delay: %d\n", n);}while(0);
+#define safe_delay(n) delay(n)
+#define _delay_ms(n) delay(n)
 #define ISR(n) void n ## _isr()
 
 #define cli() 

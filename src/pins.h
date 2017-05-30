@@ -23,6 +23,16 @@
 #ifndef PINS_H
 #define PINS_H
 
+#include <stdio.h>
+
+
+#define analogInputToDigitalPin(p) (p)
+#define OUTPUT 1
+#define INPUT 0
+#define pinMode(pin,mode) do{printf("mode pin %d as %d\n", pin, mode);}while(0);
+#define digitalWrite(pin,lvl) do{printf("write pin %d to %d\n", pin, lvl);}while(0);
+#define digitalRead(pin) (0)
+
 #if MB(GEN7_CUSTOM)
   #include "pins_GEN7_CUSTOM.h"
 #elif MB(GEN7_12)

@@ -142,7 +142,10 @@ extern uint8_t LOW;
 #define PSTR(s) (s)
 #define pgm_read_word(x) (0)
 #define pgm_read_word_near(x) (0)
+#define pgm_read_float_near(x) (0)
+#define pgm_read_byte_near(x) (0)
 #define constrain(a, b, c) (a)
+#define sprintf_P(buf, fmt, ...) (*buf = '\0')
 
 // The presence of the UBRRH register is used to detect a UART.
 #define UART_PRESENT(port) ((port == 0 && (defined(UBRRH) || defined(UBRR0H))) || \
