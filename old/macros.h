@@ -23,7 +23,7 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#include <time.h>
+#include <string.h>
 
 #define NUM_AXIS 4
 #define XYZE 4
@@ -34,10 +34,8 @@
 
 // Bracket code that shouldn't be interrupted
 #ifndef CRITICAL_SECTION_START
-  // #define CRITICAL_SECTION_START  unsigned char _sreg = SREG; cli();
-  #define CRITICAL_SECTION_START
-  // #define CRITICAL_SECTION_END    SREG = _sreg;
-  #define CRITICAL_SECTION_END
+  #define CRITICAL_SECTION_START  unsigned char _sreg = SREG; cli();
+  #define CRITICAL_SECTION_END    SREG = _sreg;
 #endif
 
 // Clock speed factors
@@ -186,22 +184,5 @@
 
 #define RECIPROCAL(x) (NEAR_ZERO(x) ? 0.0 : 1.0 / (x))
 #define FIXFLOAT(f) (f + 0.00001)
-
-#define sq(a) (a * a)
-#define F_CPU 16000000
-
-#define PROGMEM   
-
-#define SREG 0
-
-#undef max
-#ifndef max
-  #define max(a,b) ((a) > (b) ? (a) : (b))
-#endif
-
-#undef min
-#ifndef min
-  #define min(a,b) ((a) < (b) ? (a) : (b))
-#endif
 
 #endif //__MACROS_H

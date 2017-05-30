@@ -28,25 +28,31 @@
 #include <string.h>
 #include <inttypes.h>
 
-
-// #include <util/delay.h>
-// #include <avr/pgmspace.h>
-// #include <avr/eeprom.h>
-// #include <avr/interrupt.h>
+/*
+  #include <util/delay.h>
+  #include <avr/pgmspace.h>
+  #include <avr/eeprom.h>
+  #include <avr/interrupt.h>
+*/
 
 #include "MarlinConfig.h"
 
 #include "enum.h"
-#include "types.h"
-#include "fastio.h"
-// #include "utility.h"
-#include "serial.h"
 
-#if ENABLED(PRINTCOUNTER)
-  #include "printcounter.h"
-#else
-  #include "stopwatch.h"
-#endif
+/*
+  #include "types.h"
+  #include "fastio.h"
+  #include "utility.h"
+  #include "serial.h"
+*/
+
+/*
+  #if ENABLED(PRINTCOUNTER)
+    #include "printcounter.h"
+  #else
+    #include "stopwatch.h"
+  #endif
+*/
 
 void idle(
   #if ENABLED(FILAMENT_CHANGE_FEATURE)
@@ -398,12 +404,14 @@ int16_t code_value_temp_diff();
   extern float retract_recover_length, retract_recover_length_swap, retract_recover_feedrate_mm_s;
 #endif
 
-// Print job timer
-#if ENABLED(PRINTCOUNTER)
-  extern PrintCounter print_job_timer;
-#else
-  extern Stopwatch print_job_timer;
-#endif
+/*
+  // Print job timer
+  #if ENABLED(PRINTCOUNTER)
+    extern PrintCounter print_job_timer;
+  #else
+    extern Stopwatch print_job_timer;
+  #endif
+*/
 
 // Handling multiple extruders pins
 extern uint8_t active_extruder;
