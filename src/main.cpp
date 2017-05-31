@@ -106,9 +106,9 @@ int main(int argc, char* argv[]) {
                             "G1 X126.21 Y114.857 E5.36077" };
     int num_moves = 121 - 73 + 1;
     */
-    const char* moves[] { "G1 X100.0 Y150.0 Z100.0 E10.0"
-                        , "G1 X150.0 Y200.0 Z150.0 E20.0"
-                        , "G1 X100.0 Y150.0 Z100.0 E10.0" };
+    const char* moves[] { "G1 X200.0 Y150.0 Z100.0 E10.0"
+                        , "G1 X0.0 Y0.0 Z0.0 E0.0"
+                        , "G1 X200.0 Y150.0 Z100.0 E10.0" };
     int num_moves = 3;
     calc_moves(moves, num_moves);
 }

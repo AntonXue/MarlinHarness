@@ -12405,12 +12405,16 @@ void loop() {
 }
 
 // Actual harness stuff going on.
+long block_steps[XYZE_N];
+float block_mms[XYZE_N];
+
 long acc_steps[XYZE_N];
-int acc_steps_counter = 0;
-void reset_acc_steps() {
-    acc_steps_counter = 0;
+float acc_mms[XYZE_N];
+
+void reset_blocks() {
     for (int i = 0; i < XYZE_N; i++) {
-        acc_steps[i] = 0;
+        block_steps[i] = 0;
+        block_mms[i] = 0;
     }
 }
 
@@ -12420,6 +12424,8 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
     for (int i = 0; i < XYZE_N; i++) {
         planner.axis_steps_per_mm[i] = default_steps[i];
     }
+
+    planner.refresh_positioning();
 
     if (num_cmds > MAX_CMD_BUF_SIZE || num_cmds < 0) {
         fprintf(stderr, "Invalid number of commands!\n");
@@ -12446,9 +12452,15 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
         planner.block_buffer_head = 0;
         planner.block_buffer_tail = 0;
 
-        printf("Accumulated Steps: [%ld, %ld, %ld, %ld]\n",
-               acc_steps[X_AXIS], acc_steps[Y_AXIS], acc_steps[Z_AXIS], acc_steps[E_AXIS]);
-        reset_acc_steps();
+        printf("block_steps: [%ld, %ld, %ld, %ld] -> block_mms: [%f, %f, %f, %f]\n",
+                block_steps[X_AXIS], block_steps[Y_AXIS], block_steps[Z_AXIS], block_steps[E_AXIS],
+                block_mms[X_AXIS], block_mms[Y_AXIS], block_mms[Z_AXIS], block_mms[E_AXIS]);
+
+        printf("acc_steps: [%ld, %ld, %ld, %ld] -> acc_mms: [%f, %f, %f, %f]\n",
+               acc_steps[X_AXIS], acc_steps[Y_AXIS], acc_steps[Z_AXIS], acc_steps[E_AXIS],
+               acc_mms[X_AXIS], acc_mms[Y_AXIS], acc_mms[Z_AXIS], acc_mms[E_AXIS]);
+
+        reset_blocks();
     }
     printf("harness complete\n");
 }

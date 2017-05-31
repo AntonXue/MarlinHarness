@@ -809,23 +809,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   block->steps[E_AXIS] = esteps;
   block->step_event_count = MAX4(block->steps[X_AXIS], block->steps[Y_AXIS], block->steps[Z_AXIS], esteps);
 
-  int bdx = (da < 0)? -1 : 1;
-  int bdy = (db < 0)? -1 : 1;
-  int bdz = (dc < 0)? -1 : 1;
-  int bde = (de < 0)? -1 : 1;
-  /*
-  printf("block->steps: [%ld, %ld, %ld, %ld]\n",
-         da * block->steps[X_AXIS], db * block->steps[Y_AXIS],
-         dc * block->steps[Z_AXIS], de * block->steps[E_AXIS]);
-  */
-
-  acc_steps[X_AXIS] += da * block->steps[X_AXIS];
-  acc_steps[Y_AXIS] += db * block->steps[Y_AXIS];
-  acc_steps[Z_AXIS] += dc * block->steps[Z_AXIS];
-  acc_steps[E_AXIS] += de * block->steps[E_AXIS];
-  acc_steps_counter++;
-
-  // Bail if this is a zero-length block
+    // Bail if this is a zero-length block
   if (block->step_event_count < MIN_STEPS_PER_SEGMENT) return;
 
   // For a mixing extruder, get a magnified step_event_count for each
@@ -1418,7 +1402,33 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
 
   stepper.wake_up();
 
+  // Anton: Keep track of our stuff :)
+  
+  block_mms[X_AXIS] = delta_mm[X_AXIS];
+  block_mms[Y_AXIS] = delta_mm[X_AXIS];
+  block_mms[Z_AXIS] = delta_mm[X_AXIS];
+  block_mms[E_AXIS] = delta_mm[X_AXIS];
 
+  acc_mms[X_AXIS] += delta_mm[X_AXIS];
+  acc_mms[Y_AXIS] += delta_mm[Y_AXIS];
+  acc_mms[Z_AXIS] += delta_mm[E_AXIS];
+  acc_mms[E_AXIS] += delta_mm[Z_AXIS];
+
+
+  int bdx = (da < 0)? -1 : 1;
+  int bdy = (db < 0)? -1 : 1;
+  int bdz = (dc < 0)? -1 : 1;
+  int bde = (de < 0)? -1 : 1;
+
+  block_steps[X_AXIS] = block->steps[X_AXIS];
+  block_steps[Y_AXIS] = block->steps[Y_AXIS];
+  block_steps[Z_AXIS] = block->steps[Z_AXIS];
+  block_steps[E_AXIS] = block->steps[E_AXIS];
+
+  acc_steps[X_AXIS] += bdx * block->steps[X_AXIS];
+  acc_steps[Y_AXIS] += bdy * block->steps[Y_AXIS];
+  acc_steps[Z_AXIS] += bdz * block->steps[Z_AXIS];
+  acc_steps[E_AXIS] += bde * block->steps[E_AXIS];
 } // buffer_line()
 
 /**
