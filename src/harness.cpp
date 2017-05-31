@@ -1660,10 +1660,6 @@ inline void line_to_current_position() {
 // Move the planner, not necessarily synced with current_position
 //
 inline void line_to_destination(float fr_mm_s) {
-  printf("current position: [%f, %f, %f, %f]\n", current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
-  printf("buffering line: [%f, %f, %f, %f]\n", destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS]);
-  VALGRIND_PRINTF_BACKTRACE("WE HERE\n");
-  exit(1);
   planner.buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], fr_mm_s, active_extruder);
 }
 inline void line_to_destination() { line_to_destination(feedrate_mm_s); }
@@ -12407,10 +12403,6 @@ void loop() {
   idle();
 }
 
-/*
-void calc_move(float cur[XYZE_DIM], float tgt[MAX_CMD_BUF_SIZE][XYZE_DIM]) {}
-*/
-
 void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
     if (num_cmds > MAX_CMD_BUF_SIZE || num_cmds < 0) {
         fprintf(stderr, "Invalid number of commands!\n");
@@ -12425,6 +12417,8 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
     for (int i = 0; i < num_cmds; i++) {
         printf("Processing command #%d: %s\n", i + 1, command_queue[i]);
         process_next_command();
+        --commands_in_queue;
+        ++cmd_queue_index_r;  // Anton: Too much time wasted on this bug :)
     }
 }
 
