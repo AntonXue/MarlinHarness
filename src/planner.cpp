@@ -770,8 +770,6 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   // Calculate the buffer head after we push this byte
   const uint8_t next_buffer_head = next_block_index(block_buffer_head);
 
-  printf("WE HERE\n");
-
   // If the buffer is full: good! That means we are well ahead of the robot.
   // Rest here until there is room in the buffer.
   while (block_buffer_tail == next_buffer_head) idle();
@@ -810,11 +808,8 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   block->step_event_count = MAX4(block->steps[X_AXIS], block->steps[Y_AXIS], block->steps[Z_AXIS], esteps);
 
 
-  printf("WE HERE BEFORE VAIL\n");
   // Bail if this is a zero-length block
   if (block->step_event_count < MIN_STEPS_PER_SEGMENT) return;
-
-  printf("YEAH NO BAIL!!!\n");
 
   // For a mixing extruder, get a magnified step_event_count for each
   #if ENABLED(MIXING_EXTRUDER)
@@ -1406,7 +1401,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
 
   stepper.wake_up();
 
-  printf("BLOCK steps: [%d, %d, %d, %d]\n", block->steps[X_AXIS],
+  printf("block->steps: [%d, %d, %d, %d]\n", block->steps[X_AXIS],
          block->steps[Y_AXIS], block->steps[Z_AXIS], block->steps[E_AXIS]);
 
 } // buffer_line()

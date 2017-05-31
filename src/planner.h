@@ -40,6 +40,10 @@
   #include "vector_3.h"
 #endif
 
+// Anton: hahaha
+#undef BLOCK_BUFFER_SIZE
+#define BLOCK_BUFFER_SIZE 1024
+
 enum BlockFlagBit {
   // Recalculate trapezoids on entry junction. For optimization.
   BLOCK_BIT_RECALCULATE,

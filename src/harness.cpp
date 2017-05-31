@@ -12422,11 +12422,11 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
 
     for (int i = 0; i < num_cmds; i++) {
         printf("-------------------------------------------------------------\n");
-        printf("Processing command #%d: %s\n", i + 1, command_queue[i]);
+        printf("[%d] Processing command: %s\n", i + 1, command_queue[i]);
         process_next_command();
         --commands_in_queue;
         ++cmd_queue_index_r;  // Anton: Too much time wasted on this bug :)
     }
-    printf("here\n");
+    printf("harness complete\n");
 }
 
