@@ -9,6 +9,6 @@
 #define XYZE_E 3
 
 // void calc_move(float cur[], float tgt[MAX_CMD_BUF_SIZE][XYZE_DIM]);
-void calc_moves(char* cmds[], int num_cmds=MAX_CMD_BUF_SIZE);
+void calc_moves(const char* cmds[], int num_cmds=MAX_CMD_BUF_SIZE);
 
 #endif

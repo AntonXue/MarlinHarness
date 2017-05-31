@@ -12405,9 +12405,10 @@ void loop() {
 void calc_move(float cur[XYZE_DIM], float tgt[MAX_CMD_BUF_SIZE][XYZE_DIM]) {}
 */
 
-void calc_moves(char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
+void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
     if (num_cmds > MAX_CMD_BUF_SIZE || num_cmds < 0) {
         fprintf(stderr, "Invalid number of commands!\n");
+        fprintf(stderr, "0 <= num_cmds <= %d\n", MAX_CMD_BUF_SIZE);
         exit(1);
     }
 
@@ -12416,7 +12417,8 @@ void calc_moves(char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
     }
 
     for (int i = 0; i < num_cmds; i++) {
-        printf("command[%d]: %s\n", i, command_queue[i]);
+        printf("Processing command #%d: %s\n", i + 1, command_queue[i]);
+        process_next_command();
     }
 }
 
