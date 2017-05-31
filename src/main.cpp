@@ -54,22 +54,7 @@ void parse_g0_g1_xyze(char* cmd, float cur[XYZE_DIM], float tgt[XYZE_DIM]) {
 
 
 int main(int argc, char* argv[]) {
-    // printf("compiles and runs\n");
-    // char test[MAX_CMD_BUF_SIZE];
-    // next_cmd(test, stdin, MAX_CMD_BUF_SIZE);
-    // printf("test: %s\n", test);
-    
-    float cur[] = {150, 51, 52, 53};
-    // float tgt[XYZE_DIM];
-    float tgt[] = {155, 56, 57, 58};
-
-    // parse_g0_g1_xyze(test, cur, tgt);
-    // printf("%f, %f, %f, %f\n", tgt[0], tgt[1], tgt[2], tgt[3]);
-
-    printf("cur: [%f, %f, %f, %f]\n", cur[0], cur[1], cur[2], cur[3]);
-    printf("tgt: [%f, %f, %f, %f]\n", tgt[0], tgt[1], tgt[2], tgt[3]);
-    // calc_move(cur, tgt);
-
+    /*
     const char* moves[] = { "G1 X80.495 Y77.039 E3.56411",
                             "G1 X81.1 Y76.538 E3.58091",
                             "G1 X83.527 Y74.775 E3.64502",
@@ -120,6 +105,10 @@ int main(int argc, char* argv[]) {
                             "G1 X126.588 Y114.169 E5.34397",
                             "G1 X126.21 Y114.857 E5.36077" };
     int num_moves = 121 - 73 + 1;
-    
+    */
+    const char* moves[] { "G1 X100.0 Y150.0 Z100.0 E10.0"
+                        , "G1 X150.0 Y200.0 Z150.0 E20.0"
+                        , "G1 X100.0 Y150.0 Z100.0 E10.0" };
+    int num_moves = 3;
     calc_moves(moves, num_moves);
 }

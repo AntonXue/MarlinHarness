@@ -11629,7 +11629,8 @@ void prepare_move_to_destination() {
     else
       C2 = (HYPOT2(sx, sy) - (L1_2 + L2_2)) / (2.0 * L1 * L2);
 
-    S2 = sqrt(sq(C2) - 1);
+    // S2 = sqrt(sq(C2) - 1);
+    S2 = sqrt(1 - sq(C2));
 
     // Unrotated Arm1 plus rotated Arm2 gives the distance from Center to End
     SK1 = L1 + L2 * C2;
@@ -12419,6 +12420,10 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
     for (int i = 0; i < num_cmds; i++) {
         _enqueuecommand(cmds[i]);
     }
+
+    printf("starting position: [%f, %f, %f, %f]\n",
+            current_position[X_AXIS], current_position[Y_AXIS],
+            current_position[Z_AXIS], current_position[E_AXIS]);
 
     for (int i = 0; i < num_cmds; i++) {
         printf("-------------------------------------------------------------\n");
