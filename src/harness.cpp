@@ -12404,6 +12404,12 @@ void loop() {
 }
 
 void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
+    // setup();  // Anton: Don't fucking touch this because it breaks shit.
+    float default_steps[XYZE_N] = DEFAULT_AXIS_STEPS_PER_UNIT;
+    for (int i = 0; i < XYZE_N; i++) {
+        planner.axis_steps_per_mm[i] = default_steps[i];
+    }
+
     if (num_cmds > MAX_CMD_BUF_SIZE || num_cmds < 0) {
         fprintf(stderr, "Invalid number of commands!\n");
         fprintf(stderr, "0 <= num_cmds <= %d\n", MAX_CMD_BUF_SIZE);
@@ -12415,10 +12421,12 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
     }
 
     for (int i = 0; i < num_cmds; i++) {
+        printf("-------------------------------------------------------------\n");
         printf("Processing command #%d: %s\n", i + 1, command_queue[i]);
         process_next_command();
         --commands_in_queue;
         ++cmd_queue_index_r;  // Anton: Too much time wasted on this bug :)
     }
+    printf("here\n");
 }
 
