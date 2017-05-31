@@ -42,7 +42,11 @@
 
 // Anton: hahaha
 #undef BLOCK_BUFFER_SIZE
-#define BLOCK_BUFFER_SIZE 1024
+#define BLOCK_BUFFER_SIZE 128
+
+// Anton: Use this to keep track of steps each round.
+extern long acc_steps[XYZE_N];
+extern int acc_steps_counter;
 
 enum BlockFlagBit {
   // Recalculate trapezoids on entry junction. For optimization.

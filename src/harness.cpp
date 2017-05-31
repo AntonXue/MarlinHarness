@@ -12404,6 +12404,16 @@ void loop() {
   idle();
 }
 
+// Actual harness stuff going on.
+long acc_steps[XYZE_N];
+int acc_steps_counter = 0;
+void reset_acc_steps() {
+    acc_steps_counter = 0;
+    for (int i = 0; i < XYZE_N; i++) {
+        acc_steps[i] = 0;
+    }
+}
+
 void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
     // setup();  // Anton: Don't fucking touch this because it breaks shit.
     float default_steps[XYZE_N] = DEFAULT_AXIS_STEPS_PER_UNIT;
@@ -12431,6 +12441,14 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
         process_next_command();
         --commands_in_queue;
         ++cmd_queue_index_r;  // Anton: Too much time wasted on this bug :)
+
+        // Anton: Reset?
+        planner.block_buffer_head = 0;
+        planner.block_buffer_tail = 0;
+
+        printf("Accumulated Steps: [%ld, %ld, %ld, %ld]\n",
+               acc_steps[X_AXIS], acc_steps[Y_AXIS], acc_steps[Z_AXIS], acc_steps[E_AXIS]);
+        reset_acc_steps();
     }
     printf("harness complete\n");
 }

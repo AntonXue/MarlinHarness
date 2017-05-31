@@ -772,7 +772,9 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
 
   // If the buffer is full: good! That means we are well ahead of the robot.
   // Rest here until there is room in the buffer.
-  while (block_buffer_tail == next_buffer_head) idle();
+
+  // Anton: Is this a good idea?!?!
+  // while (block_buffer_tail == next_buffer_head) idle();
 
   // Prepare to set up new block
   block_t* block = &block_buffer[block_buffer_head];
@@ -811,9 +813,17 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   int bdy = (db < 0)? -1 : 1;
   int bdz = (dc < 0)? -1 : 1;
   int bde = (de < 0)? -1 : 1;
+  /*
   printf("block->steps: [%ld, %ld, %ld, %ld]\n",
          da * block->steps[X_AXIS], db * block->steps[Y_AXIS],
          dc * block->steps[Z_AXIS], de * block->steps[E_AXIS]);
+  */
+
+  acc_steps[X_AXIS] += da * block->steps[X_AXIS];
+  acc_steps[Y_AXIS] += db * block->steps[Y_AXIS];
+  acc_steps[Z_AXIS] += dc * block->steps[Z_AXIS];
+  acc_steps[E_AXIS] += de * block->steps[E_AXIS];
+  acc_steps_counter++;
 
   // Bail if this is a zero-length block
   if (block->step_event_count < MIN_STEPS_PER_SEGMENT) return;
