@@ -8,7 +8,9 @@
 #define XYZE_Z 2
 #define XYZE_E 3
 
-// void calc_move(float cur[], float tgt[MAX_CMD_BUF_SIZE][XYZE_DIM]);
-void calc_moves(const char* cmds[], int num_cmds=MAX_CMD_BUF_SIZE);
+extern long acc_steps[XYZE_DIM];
+extern float acc_mms[XYZE_DIM];
+
+void calc_moves(int debug, char cmds[][MAX_CMD_BUF_SIZE], int num_cmds=MAX_CMD_BUF_SIZE);
 
 #endif

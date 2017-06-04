@@ -842,7 +842,9 @@ static bool drain_injected_commands_P() {
  * Aborts the current queue, if any.
  * Note: drain_injected_commands_P() must be called repeatedly to drain the commands afterwards
  */
-void enqueue_and_echo_commands_P(const char* pgcode) {
+// Anton: Remove the stupid fucking const
+// void enqueue_and_echo_commands_P(const char* pgcode) {
+void enqueue_and_echo_commands_P(char* pgcode) {
   injected_commands_P = pgcode;
   drain_injected_commands_P(); // first command executed asap (when possible)
 }
@@ -869,7 +871,9 @@ inline void _commit_command(bool say_ok) {
  * Return true if the command was successfully added.
  * Return false for a full buffer, or if the 'command' is a comment.
  */
-inline bool _enqueuecommand(const char* cmd, bool say_ok=false) {
+// Anton: dropping some consts
+// inline bool _enqueuecommand(const char* cmd, bool say_ok=false) {
+inline bool _enqueuecommand(char* cmd, bool say_ok=false) {
   if (*cmd == ';' || commands_in_queue >= MAX_CMD_BUF_SIZE) return false;
   strcpy(command_queue[cmd_queue_index_w], cmd);
   _commit_command(say_ok);
@@ -879,8 +883,10 @@ inline bool _enqueuecommand(const char* cmd, bool say_ok=false) {
 /**
  * Enqueue with Serial Echo
  */
+// Anton: dropping more consts.
+// bool enqueue_and_echo_command(const char* cmd, bool say_ok/*=false*/) {
 bool enqueue_and_echo_command(const char* cmd, bool say_ok/*=false*/) {
-  if (_enqueuecommand(cmd, say_ok)) {
+  if (_enqueuecommand(strdup(cmd), say_ok)) {
     SERIAL_ECHO_START;
     SERIAL_ECHOPAIR(MSG_ENQUEUEING, cmd);
     SERIAL_CHAR('"');
@@ -12418,7 +12424,7 @@ void reset_blocks() {
     }
 }
 
-void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
+void calc_moves(int debug, char cmds[][MAX_CMD_BUF_SIZE], int num_cmds) {
     // setup();  // Anton: Don't fucking touch this because it breaks shit.
     float default_steps[XYZE_N] = DEFAULT_AXIS_STEPS_PER_UNIT;
     for (int i = 0; i < XYZE_N; i++) {
@@ -12437,13 +12443,18 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
         _enqueuecommand(cmds[i]);
     }
 
-    printf("starting position: [%f, %f, %f, %f]\n",
-            current_position[X_AXIS], current_position[Y_AXIS],
-            current_position[Z_AXIS], current_position[E_AXIS]);
+    if (debug) {
+        printf("starting position: [%f, %f, %f, %f]\n",
+                current_position[X_AXIS], current_position[Y_AXIS],
+                current_position[Z_AXIS], current_position[E_AXIS]);
+    }
 
     for (int i = 0; i < num_cmds; i++) {
-        printf("-------------------------------------------------------------\n");
-        printf("[%d] Processing command: %s\n", i + 1, command_queue[i]);
+        if (debug) {
+            printf("----------------------------------------------------\n");
+            printf("[%d] Processing command: %s\n", i + 1, command_queue[i]);
+        }
+
         process_next_command();
         --commands_in_queue;
         ++cmd_queue_index_r;  // Anton: Too much time wasted on this bug :)
@@ -12452,16 +12463,21 @@ void calc_moves(const char* cmds[MAX_CMD_BUF_SIZE], int num_cmds) {
         planner.block_buffer_head = 0;
         planner.block_buffer_tail = 0;
 
-        printf("block_steps: [%ld, %ld, %ld, %ld] -> block_mms: [%f, %f, %f, %f]\n",
-                block_steps[X_AXIS], block_steps[Y_AXIS], block_steps[Z_AXIS], block_steps[E_AXIS],
-                block_mms[X_AXIS], block_mms[Y_AXIS], block_mms[Z_AXIS], block_mms[E_AXIS]);
+        if (debug) {
+            printf("block_steps: [%ld, %ld, %ld, %ld] -> block_mms: [%f, %f, %f, %f]\n",
+                    block_steps[X_AXIS], block_steps[Y_AXIS], block_steps[Z_AXIS], block_steps[E_AXIS],
+                    block_mms[X_AXIS], block_mms[Y_AXIS], block_mms[Z_AXIS], block_mms[E_AXIS]);
 
-        printf("acc_steps: [%ld, %ld, %ld, %ld] -> acc_mms: [%f, %f, %f, %f]\n",
-               acc_steps[X_AXIS], acc_steps[Y_AXIS], acc_steps[Z_AXIS], acc_steps[E_AXIS],
-               acc_mms[X_AXIS], acc_mms[Y_AXIS], acc_mms[Z_AXIS], acc_mms[E_AXIS]);
+            printf("acc_steps: [%ld, %ld, %ld, %ld] -> acc_mms: [%f, %f, %f, %f]\n",
+                   acc_steps[X_AXIS], acc_steps[Y_AXIS], acc_steps[Z_AXIS], acc_steps[E_AXIS],
+                   acc_mms[X_AXIS], acc_mms[Y_AXIS], acc_mms[Z_AXIS], acc_mms[E_AXIS]);
+        }
 
         reset_blocks();
     }
-    printf("harness complete\n");
+
+    if (debug) {
+        printf("harness complete\n");
+    }
 }
 

@@ -1411,8 +1411,8 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
 
   acc_mms[X_AXIS] += delta_mm[X_AXIS];
   acc_mms[Y_AXIS] += delta_mm[Y_AXIS];
-  acc_mms[Z_AXIS] += delta_mm[E_AXIS];
-  acc_mms[E_AXIS] += delta_mm[Z_AXIS];
+  acc_mms[Z_AXIS] += delta_mm[Z_AXIS];
+  acc_mms[E_AXIS] += delta_mm[E_AXIS];
 
 
   int bdx = (da < 0)? -1 : 1;
