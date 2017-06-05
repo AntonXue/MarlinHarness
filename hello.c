@@ -47,11 +47,6 @@ void mexFunction(int nlhs, mxArray *plhs[],
     int amt = mxGetN(prhs[0]);
     double* test = mxGetPr(prhs[0]);
 
-    int j;
-    for (j = 0; j < 20; j++) {
-        printf("test[%d]: %f\n", j, test[j]);
-    }
-
     if (amt % 4 != 0) {
         fprintf(stderr, "%d is not a multiple of 4!\n", amt);
     }
