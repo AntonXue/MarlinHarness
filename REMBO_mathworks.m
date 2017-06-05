@@ -51,7 +51,7 @@ log_filename = [dirname '/' timestamp '.txt'];
 diary(log_filename);
 diary on;
 
-results=bayesopt(@hello_wrapper,variables,...
+results=bayesopt(@f,variables,...
     'AcquisitionFunctionName', 'expected-improvement', ...
     'MaxObjectiveEvaluations', max_evals, ...
     'IsObjectiveDeterministic', true, ...
@@ -93,7 +93,7 @@ for i=0:nld-1
 end
 
 hd_params = project_into_box(params);
-score = f(hd_params');
+score = hello(hd_params');
 
 end
 
