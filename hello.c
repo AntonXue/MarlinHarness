@@ -46,7 +46,11 @@ void do_the_call(int n, double cmds[]) {
 
 void mexFunction(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[]) {
-    int amt = mxGetScalar(prhs[0]);
+    /*
+      int amt = mxGetScalar(prhs[0]);
+      double* test = mxGetPr(prhs[1]);
+    */
+    int amt = 20;
     double* test = mxGetPr(prhs[1]);
 
     target[0] = test[amt - 4];
