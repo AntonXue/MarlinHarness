@@ -6,8 +6,8 @@ timestamp = datestr(datetime('now'));
 dirname=['exps-' timestamp];
 mkdir(dirname);
     
-max_evals = 20;
-num_of_exps = 5;
+max_evals = 50;
+num_of_exps = 10;
 
 global nld
 global nhd
@@ -92,7 +92,7 @@ for i=0:nld-1
     params=[params eval(['x.' varname])];
 end
 
-hd_params = project_into_box(params)
+hd_params = project_into_box(params);
 score = hello(hd_params);
 
 end

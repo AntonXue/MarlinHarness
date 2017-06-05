@@ -6,8 +6,8 @@ timestamp = datestr(datetime('now'));
 dirname=['exps-' timestamp];
 mkdir(dirname);
     
-max_evals = 20;
-num_of_exps = 5;
+max_evals = 50;
+num_of_exps = 10;
 
 global n;
 n = 20;                % number of actual dims
