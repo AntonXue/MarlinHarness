@@ -7,7 +7,6 @@
 #define BUF_SIZE 8192
 
 double eps = 0.000001;
-
 double location[4] = { 0 };
 
 double target[4] = { 0 };
@@ -18,7 +17,7 @@ double mag_err(double err) {
     if (fabs(err) < eps) {
         return 0;
     } else {
-        return 100000 * err;
+        return err / eps;
     }
 }
 
@@ -46,22 +45,13 @@ void do_the_call(int n, double cmds[]) {
 
 void mexFunction(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[]) {
-    /*
-      int amt = mxGetScalar(prhs[0]);
-      double* test = mxGetPr(prhs[1]);
-    */
-    int amt = 20;
-    double* test = mxGetPr(prhs[1]);
+    int amt = mxGetN(prhs[0]);
+    double* test = mxGetPr(prhs[0]);
 
     target[0] = test[amt - 4];
     target[1] = test[amt - 3];
     target[2] = test[amt - 2];
     target[3] = test[amt - 1];
-
-    /*
-      plhs[0] = mxCreateDoubleMatrix(1, 4, mxREAL);
-      location = mxGetPr(plhs[0]);
-    */
 
     do_the_call(amt, test);
     
@@ -70,7 +60,11 @@ void mexFunction(int nlhs, mxArray *plhs[],
                           sq(target[2] - location[2]));
 
     /*
-      printf("calculated diff: %f\n", mag_err(value));
+    printf("Actual: [%f, %f, %f, %f]\n",
+          location[0], location[1], location[2], location[3]);
+
+    printf("Target: [%f, %f, %f, %f]\n",
+          target[0], target[1], target[2], target[3]);
     */
 
     plhs[0] = mxCreateDoubleScalar(mag_err(value));
