@@ -34,7 +34,6 @@ void do_the_call(int n, double cmds[]) {
     char stuff[1024];
     if (fp == NULL) {
         fprintf(stderr, "Failed to run command\n");
-        exit(1);
     }
 
     int d = 0;
@@ -55,7 +54,6 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
     if (amt % 4 != 0) {
         fprintf(stderr, "%d is not a multiple of 4!\n", amt);
-        exit(1);
     }
 
     target[0] = test[amt - 4];
@@ -77,7 +75,10 @@ void mexFunction(int nlhs, mxArray *plhs[],
           target[0], target[1], target[2], target[3]);
     */
 
+    /*
     plhs[0] = mxCreateDoubleScalar(mag_err(value));
+    */
+    plhs[0] = mxCreateDoubleScalar(value);
 }
 
 int main(int argc, char* argv[]) {
