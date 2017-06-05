@@ -92,7 +92,7 @@ for i=0:nld-1
     params=[params eval(['x.' varname])];
 end
 
-hd_params = project_into_box(params);
+hd_params = project_into_box(params)
 score = hello(hd_params');
 
 end
