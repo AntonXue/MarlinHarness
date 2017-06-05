@@ -6,8 +6,8 @@ timestamp = datestr(datetime('now'));
 dirname=['exps-' timestamp];
 mkdir(dirname);
     
-max_evals = 100;
-num_of_exps = 10;
+max_evals = 20;
+num_of_exps = 5;
 
 global nld
 global nhd
@@ -19,8 +19,8 @@ nhd = 20;                % number of actual dims
 % Define box in high-dim space
 global lbhd;
 global ubhd;
-lbhd = zeros(1,nhd);
-ubhd = ones(1,nhd)*300;
+lbhd = ones(1,nhd)*50;
+ubhd = ones(1,nhd)*150;
 
 % Assuming the origin is in the box, half the spatial diagonal is the
 % furthest in the Euclidean norm that a point can be from the origin.
@@ -93,7 +93,7 @@ for i=0:nld-1
 end
 
 hd_params = project_into_box(params)
-score = hello(hd_params');
+score = hello(hd_params);
 
 end
 
