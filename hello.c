@@ -1,11 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <mex.h>
 
 #define BUF_SIZE 8192
 
-double* diffs;
+double eps = 0.000001;
+
+double location[4] = { 0 };
+
+double target[4] = { 0 };
+
+double sq(double a) { return a * a; }
+
+double mag_err(double err) {
+    if (fabs(err) < eps) {
+        return 0;
+    } else {
+        return 100000 * err;
+    }
+}
 
 void do_the_call(int n, double cmds[]) {
     char buf[BUF_SIZE];
@@ -25,31 +40,39 @@ void do_the_call(int n, double cmds[]) {
 
     int d = 0;
     while (fgets(stuff, sizeof(stuff) - 1, fp) != NULL && d < 4) {
-        diffs[d++] = strtod(stuff, NULL);
+        location[d++] = strtod(stuff, NULL);
     }
 }
 
 void mexFunction(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[]) {
-    double amt = mxGetScalar(prhs[0]);
+    int amt = mxGetScalar(prhs[0]);
     double* test = mxGetPr(prhs[1]);
 
-    plhs[0] = mxCreateDoubleMatrix(1, 4, mxREAL);
-    diffs = mxGetPr(plhs[0]);
+    target[0] = test[amt - 4];
+    target[1] = test[amt - 3];
+    target[2] = test[amt - 2];
+    target[3] = test[amt - 1];
+
+    /*
+      plhs[0] = mxCreateDoubleMatrix(1, 4, mxREAL);
+      location = mxGetPr(plhs[0]);
+    */
 
     do_the_call(amt, test);
+    
+    double value = - sqrt(sq(target[0] - location[0]) +
+                          sq(target[1] - location[1]) +
+                          sq(target[2] - location[2]));
+
+    /*
+      printf("calculated diff: %f\n", mag_err(value));
+    */
+
+    plhs[0] = mxCreateDoubleScalar(mag_err(value));
 }
 
 int main(int argc, char* argv[]) {
-    /*
-      double test[] = {1, 2, 3, 4, 5, 6, 7, 8 };
-      do_the_call(8, test);
-
-      int i;
-      for (i = 0; i < 4; i++) {
-          printf("hue: %f\n", diffs[i]);
-      }
-    */
     printf("Meant to be called from inside Matlab!\n");
 }
 
