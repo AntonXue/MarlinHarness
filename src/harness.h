@@ -10,6 +10,7 @@
 
 extern long acc_steps[XYZE_DIM];
 extern float acc_mms[XYZE_DIM];
+extern float delta[3];
 
 void calc_moves(int debug, char cmds[][MAX_CMD_BUF_SIZE], int num_cmds=MAX_CMD_BUF_SIZE);
 

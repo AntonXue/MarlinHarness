@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "harness.h"
 
@@ -72,8 +73,29 @@ int main(int argc, char* argv[]) {
 
     calc_moves(0, moves, num_moves);
 
+    /*
+    // Cartesian.
     printf("%f\n", acc_mms[XYZE_X]);
     printf("%f\n", acc_mms[XYZE_Y]);
+    printf("%f\n", acc_mms[XYZE_Z]);
+    printf("%f\n", acc_mms[XYZE_E]);
+    */
+
+    // SCARA
+    float SCARA_OFF_X = 100;
+    float SCARA_OFF_Y = -56;
+    float PI = 3.14159265359;
+    
+    float a_sin = sin((delta[XYZE_X]) * PI / 180.0) * 150;
+    float a_cos = cos((delta[XYZE_X]) * PI / 180.0) * 150;
+    float b_sin = sin((delta[XYZE_Y]) * PI / 180.0) * 150;
+    float b_cos = cos((delta[XYZE_Y]) * PI / 180.0) * 150;
+
+    float px = a_cos + b_cos + SCARA_OFF_X;
+    float py = a_sin + b_sin + SCARA_OFF_Y;
+
+    printf("%f\n", px);
+    printf("%f\n", py);
     printf("%f\n", acc_mms[XYZE_Z]);
     printf("%f\n", acc_mms[XYZE_E]);
 }
