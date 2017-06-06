@@ -44,7 +44,10 @@ void do_the_call(int n, double cmds[]) {
 
 void mexFunction(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[]) {
-    int amt = mxGetN(prhs[0]);
+    int cols = mxGetN(prhs[0]);
+    int rows = mxGetM(prhs[0]);
+    int amt = (cols > rows) ? cols : rows;
+
     double* test = mxGetPr(prhs[0]);
 
     if (amt % 4 != 0) {
