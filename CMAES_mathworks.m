@@ -6,20 +6,21 @@ timestamp = datestr(datetime('now'));
 dirname=['exps-' timestamp];
 mkdir(dirname);
     
-max_evals = 100;
-num_of_exps = 5;
+max_evals = 5000;
+num_of_exps = 1;
 
 global n;
-n = 20;                % number of actual dims
+n = 100;                % number of actual dims
 
 % Define box in high-dim space
 global lb;
 global ub;
-lb = 0;
-ub = 244;
+lb = 5;
+ub = 154;
 
 opts.LBounds=lb;
 opts.UBounds=ub;
+opts.MaxFunEvals=max_evals;
 
 first_false_inds=[];
 for exp=1:num_of_exps
@@ -40,7 +41,11 @@ diary on;
     'hello', ...    % name of objective/fitness function
     repmat(lb+ub,n,1)/2, ...    % objective variables initial point, determines N
     ub-lb, ... % initial coordinate wise standard deviation(s)
-    opts)
+    opts);
+
+xmin'
+fmin
+counteval
 
 %obj_min_trace=results.ObjectiveMinimumTrace
 %num_false=size(results.ObjectiveMinimumTrace(results.ObjectiveMinimumTrace<0),1)
