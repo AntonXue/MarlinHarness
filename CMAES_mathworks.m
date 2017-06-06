@@ -15,8 +15,8 @@ n = 20;                % number of actual dims
 % Define box in high-dim space
 global lb;
 global ub;
-lb = 50;
-ub = 150;
+lb = 0;
+ub = 244;
 
 opts.LBounds=lb;
 opts.UBounds=ub;
@@ -39,6 +39,7 @@ diary on;
     ] = cmaes( ...
     'hello', ...    % name of objective/fitness function
     repmat(lb+ub,n,1)/2, ...    % objective variables initial point, determines N
+    ub-lb, ... % initial coordinate wise standard deviation(s)
     opts)
 
 %obj_min_trace=results.ObjectiveMinimumTrace
